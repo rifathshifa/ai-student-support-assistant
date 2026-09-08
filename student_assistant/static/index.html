@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solace — AI Student Support Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css?v=solace-theme-4">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><i data-lucide="sparkles"></i></div>
+        <div>
+          <div class="brand-name">Solace</div>
+          <div class="brand-caption">Student Support</div>
+        </div>
+      </div>
+
+      <div class="sidebar-rule"></div>
+      <div class="nav-eyebrow">Your workspace</div>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-tab="chat">
+          <i data-lucide="message-circle"></i>
+          <span>Ask Solace</span>
+          <span class="nav-active-dot"></span>
+        </button>
+        <button class="nav-link" data-tab="knowledge">
+          <i data-lucide="library"></i>
+          <span>Knowledge</span>
+        </button>
+        <button class="nav-link" data-tab="tools">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Campus tools</span>
+        </button>
+        <button class="nav-link" data-tab="memory">
+          <i data-lucide="user-round"></i>
+          <span>My memory</span>
+        </button>
+        <button class="nav-link" data-tab="history">
+          <i data-lucide="history"></i>
+          <span>Conversation history</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-note">
+        <div class="note-orbit"><i data-lucide="target"></i></div>
+        <div>
+          <strong>One step at a time.</strong>
+          <span>Progress is still progress.</span>
+        </div>
+      </div>
+
+      <button type="button" class="profile-card-btn" id="sidebarProfileBtn" data-tab-target="memory">
+        <div class="avatar" id="sidebarAvatar">AS</div>
+        <div class="profile-card-copy">
+          <strong id="sidebarName">Aarav Sharma</strong>
+          <span id="sidebarProgram">B.Tech CSE · Sem 5</span>
+        </div>
+        <i data-lucide="chevron-right" style="margin-left:auto; width:15px; height:15px; opacity:0.6;"></i>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumb">
+          <span>Student support</span>
+          <i data-lucide="chevron-right" style="width:13px; height:13px;"></i>
+          <strong id="topbarBreadcrumb">Ask Solace</strong>
+        </div>
+        <div class="topbar-actions">
+          <span class="status-pill"><span class="status-dot"></span> LangGraph & RAG Ready</span>
+          <div class="avatar" id="topbarAvatar" style="width:28px; height:28px; font-size:10px;">AS</div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <!-- Live Stat Ribbon -->
+        <section class="overview-grid">
+          <div class="overview-card tone-sage" data-tab-target="tools" data-tool-subtab="attendance">
+            <div class="overview-card-top">
+              <div class="overview-icon"><i data-lucide="target"></i></div>
+              <i data-lucide="arrow-up-right" style="width:15px;"></i>
+            </div>
+            <strong id="statAttendance">83%</strong>
+            <span>Attendance</span>
+            <small>Across tracked classes</small>
+          </div>
+
+          <div class="overview-card tone-coral" data-tab-target="tools" data-tool-subtab="exams">
+            <div class="overview-card-top">
+              <div class="overview-icon"><i data-lucide="book-open"></i></div>
+              <i data-lucide="arrow-up-right" style="width:15px;"></i>
+            </div>
+            <strong id="statExams">4</strong>
+            <span>Upcoming exams</span>
+            <small>Next: Data Structures</small>
+          </div>
+
+          <div class="overview-card tone-navy" data-tab-target="knowledge">
+            <div class="overview-card-top">
+              <div class="overview-icon"><i data-lucide="library"></i></div>
+              <i data-lucide="arrow-up-right" style="width:15px;"></i>
+            </div>
+            <strong id="statDocs">3</strong>
+            <span>Knowledge sources</span>
+            <small>Handbooks & syllabi</small>
+          </div>
+
+          <div class="overview-card tone-gold" data-tab-target="tools" data-tool-subtab="notices">
+            <div class="overview-card-top">
+              <div class="overview-icon"><i data-lucide="archive"></i></div>
+              <i data-lucide="arrow-up-right" style="width:15px;"></i>
+            </div>
+            <strong id="statNotices">3</strong>
+            <span>Campus notices</span>
+            <small>Exam registration active</small>
+          </div>
+        </section>
+
+        <!-- TAB: CHAT -->
+        <section class="tab-panel active" id="tab-chat">
+          <div class="assistant-panel">
+            <div class="assistant-panel-header">
+              <div class="assistant-badge">
+                <i data-lucide="sparkles" style="width:15px; height:15px;"></i>
+                <span>Ask Solace</span>
+              </div>
+              <span class="mono-label">Grounded with college sources & live tools</span>
+            </div>
+
+            <div class="chat-stream" id="chatStream">
+              <!-- Rendered messages -->
+            </div>
+
+            <form class="ask-form" id="chatForm">
+              <input type="text" id="chatInput" placeholder="Ask about regulations, exam halls, attendance or campus procedures…" autocomplete="off" />
+              <button type="submit" class="send-button" id="sendBtn">
+                <i data-lucide="send" style="width:15px; height:15px;"></i>
+              </button>
+            </form>
+
+            <div class="suggestion-row">
+              <span>Suggestions:</span>
+              <button type="button" class="sugg-btn" data-query="What is my attendance in Computer Networks?">Attendance in Networks</button>
+              <button type="button" class="sugg-btn" data-query="When and where is my Data Structures exam?">Data Structures Exam</button>
+              <button type="button" class="sugg-btn" data-query="How do I request a bonafide certificate?">Bonafide Certificate</button>
+              <button type="button" class="sugg-btn" data-query="What classes do I have on Monday?">Monday Timetable</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: KNOWLEDGE BASE -->
+        <section class="tab-panel" id="tab-knowledge">
+          <div class="page-intro">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span>Your source of truth</div>
+              <h1>Knowledge library</h1>
+              <p>The campus documents Solace uses to give you grounded, verified answers.</p>
+            </div>
+            <button type="button" class="primary-button" id="openUploadBtn">
+              <i data-lucide="upload" style="width:15px; height:15px;"></i> Add document
+            </button>
+          </div>
+          <div class="document-list" id="documentsList"></div>
+        </section>
+
+        <!-- TAB: TOOLS -->
+        <section class="tab-panel" id="tab-tools">
+          <div class="page-intro">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span>Campus integration</div>
+              <h1>Campus tools</h1>
+              <p>Live schedule, attendance calculations, circulars, and official FAQs.</p>
+            </div>
+          </div>
+
+          <div class="tool-tabs">
+            <button class="tool-tab active" data-tool="timetable"><i data-lucide="calendar"></i> Timetable</button>
+            <button class="tool-tab" data-tool="attendance"><i data-lucide="target"></i> Attendance</button>
+            <button class="tool-tab" data-tool="exams"><i data-lucide="book-open"></i> Exams</button>
+            <button class="tool-tab" data-tool="notices"><i data-lucide="archive"></i> Notices</button>
+            <button class="tool-tab" data-tool="faqs"><i data-lucide="help-circle"></i> FAQs</button>
+          </div>
+
+          <div id="toolViewContainer"></div>
+        </section>
+
+        <!-- TAB: MEMORY -->
+        <section class="tab-panel" id="tab-memory">
+          <div class="page-intro">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span>Context & preferences</div>
+              <h1>My memory</h1>
+              <p>Personal context loaded into the LangChain prompt for grounded answers.</p>
+            </div>
+            <button type="button" class="secondary-button" id="toggleEditMemoryBtn">
+              <i data-lucide="edit-3" style="width:14px; height:14px;"></i> Edit profile
+            </button>
+          </div>
+
+          <div class="memory-layout" id="memoryDisplay">
+            <div class="surface-card">
+              <div class="memory-profile-top">
+                <div class="avatar" id="memAvatar" style="width:44px; height:44px; font-size:15px;">AS</div>
+                <div>
+                  <h2 id="memName" style="font-size:22px;">Aarav Sharma</h2>
+                  <span id="memProgram" style="color:var(--ink-soft); font-size:12px;">B.Tech Computer Science · Semester 5</span>
+                </div>
+              </div>
+              <div class="memory-contact">
+                <span>Email</span>
+                <strong id="memEmail">aarav.sharma@campus.edu</strong>
+              </div>
+              <div class="memory-contact">
+                <span>Student ID</span>
+                <strong>demo-student</strong>
+              </div>
+            </div>
+
+            <div class="surface-card">
+              <div>
+                <span class="eyebrow">Academic goals</span>
+                <div class="chip-row" id="memGoals"></div>
+              </div>
+              <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--line);">
+                <span class="eyebrow">Assistant preferences</span>
+                <div class="chip-row" id="memPreferences"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit Profile Form -->
+          <form class="surface-card" id="memoryForm" style="display:none; max-width:640px; margin-top:16px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+              <div>
+                <label class="eyebrow">Full Name</label>
+                <input type="text" id="editName" required style="width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; margin-top:4px;">
+              </div>
+              <div>
+                <label class="eyebrow">Email</label>
+                <input type="email" id="editEmail" required style="width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; margin-top:4px;">
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <label class="eyebrow">Goals (comma-separated)</label>
+              <input type="text" id="editGoals" style="width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; margin-top:4px;">
+            </div>
+            <div style="margin-bottom:18px;">
+              <label class="eyebrow">Preferences (comma-separated)</label>
+              <input type="text" id="editPrefs" style="width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; margin-top:4px;">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+              <button type="button" class="secondary-button" id="cancelEditMemoryBtn">Cancel</button>
+              <button type="submit" class="primary-button">Save changes</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- TAB: HISTORY -->
+        <section class="tab-panel" id="tab-history">
+          <div class="page-intro">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span>Audit trail</div>
+              <h1>Conversation history</h1>
+              <p>Persistent SQLite log of student queries, tool calls, and citations.</p>
+            </div>
+          </div>
+          <div class="document-list" id="historyList"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Document Upload Modal -->
+  <div class="modal-backdrop hidden" id="uploadModal">
+    <div class="modal-card">
+      <div class="modal-heading">
+        <div>
+          <div class="eyebrow">Knowledge source</div>
+          <h2 style="font-size:24px; margin-top:4px;">Add document</h2>
+        </div>
+        <button type="button" class="ghost-icon" id="closeUploadBtn"><i data-lucide="x"></i></button>
+      </div>
+      <form id="uploadDocForm">
+        <div>
+          <label class="eyebrow">Document Name</label>
+          <input type="text" id="docName" placeholder="e.g. B.Tech Regulations 2026" required />
+        </div>
+        <div>
+          <label class="eyebrow">Category</label>
+          <select id="docCategory">
+            <option value="Syllabus">Syllabus</option>
+            <option value="Regulations">Regulations</option>
+            <option value="FAQs">FAQs</option>
+            <option value="Notice">Notice</option>
+          </select>
+        </div>
+        <div>
+          <label class="eyebrow">Content</label>
+          <textarea id="docContent" rows="6" placeholder="Paste document content here..." required></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
+          <button type="button" class="secondary-button" id="cancelUploadBtn">Cancel</button>
+          <button type="submit" class="primary-button">Index document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/app.js?v=solace-theme-4"></script>
+</body>
+</html>

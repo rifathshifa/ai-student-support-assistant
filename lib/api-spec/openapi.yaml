@@ -1,0 +1,396 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: AI Student Support Assistant API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: student-support
+    description: Agentic student support operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /assistant/dashboard:
+    get:
+      operationId: getAssistantDashboard
+      tags: [student-support]
+      summary: Get student support dashboard
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Dashboard snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /assistant/profile:
+    get:
+      operationId: getStudentProfile
+      tags: [student-support]
+      summary: Get the remembered student profile
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Student profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentProfile"
+    patch:
+      operationId: updateStudentProfile
+      tags: [student-support]
+      summary: Update remembered student details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentProfileInput"
+      responses:
+        "200":
+          description: Updated student profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentProfile"
+  /assistant/documents:
+    get:
+      operationId: listAssistantDocuments
+      tags: [student-support]
+      summary: List uploaded knowledge documents
+      responses:
+        "200":
+          description: Knowledge documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+    post:
+      operationId: uploadAssistantDocument
+      tags: [student-support]
+      summary: Upload a text document into the RAG knowledge base
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentInput"
+      responses:
+        "201":
+          description: Uploaded document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+  /assistant/documents/{id}:
+    delete:
+      operationId: deleteAssistantDocument
+      tags: [student-support]
+      summary: Remove a knowledge document
+      parameters:
+        - $ref: "#/components/parameters/DocumentId"
+      responses:
+        "204":
+          description: Document deleted
+  /assistant/conversations:
+    get:
+      operationId: listAssistantConversations
+      tags: [student-support]
+      summary: List recent remembered interactions
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Recent messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatMessage"
+  /assistant/chat:
+    post:
+      operationId: askAssistant
+      tags: [student-support]
+      summary: Ask the agent a question using RAG, memory, and tools
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatInput"
+      responses:
+        "200":
+          description: Agent response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+  /assistant/tools/timetable:
+    get:
+      operationId: getTimetable
+      tags: [student-support]
+      summary: Get the student's timetable
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Timetable entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimetableEntry"
+  /assistant/tools/attendance:
+    get:
+      operationId: getAttendance
+      tags: [student-support]
+      summary: Get attendance details
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Attendance details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceRecord"
+  /assistant/tools/notices:
+    get:
+      operationId: getNotices
+      tags: [student-support]
+      summary: Get latest college notices
+      responses:
+        "200":
+          description: Notices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notice"
+  /assistant/tools/exams:
+    get:
+      operationId: getExamSchedule
+      tags: [student-support]
+      summary: Get upcoming exams
+      responses:
+        "200":
+          description: Exam schedule
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exam"
+  /assistant/tools/faqs:
+    get:
+      operationId: getFaqs
+      tags: [student-support]
+      summary: Get common student FAQs
+      responses:
+        "200":
+          description: FAQs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Faq"
+components:
+  parameters:
+    StudentId:
+      name: studentId
+      in: query
+      required: false
+      schema:
+        type: string
+        default: demo-student
+    DocumentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    StudentProfile:
+      type: object
+      required: [id, name, program, semester, email, goals, preferences, updatedAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        program: { type: string }
+        semester: { type: string }
+        email: { type: string }
+        goals:
+          type: array
+          items: { type: string }
+        preferences:
+          type: array
+          items: { type: string }
+        updatedAt: { type: string }
+    StudentProfileInput:
+      type: object
+      required: [name, program, semester, email]
+      properties:
+        id: { type: string, default: demo-student }
+        name: { type: string }
+        program: { type: string }
+        semester: { type: string }
+        email: { type: string }
+        goals:
+          type: array
+          items: { type: string }
+        preferences:
+          type: array
+          items: { type: string }
+    Document:
+      type: object
+      required: [id, name, category, chunkCount, wordCount, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        category: { type: string }
+        chunkCount: { type: integer }
+        wordCount: { type: integer }
+        createdAt: { type: string }
+    DocumentInput:
+      type: object
+      required: [name, category, content]
+      properties:
+        name: { type: string }
+        category: { type: string }
+        content: { type: string, minLength: 1 }
+    Citation:
+      type: object
+      required: [documentName, category, excerpt]
+      properties:
+        documentName: { type: string }
+        category: { type: string }
+        excerpt: { type: string }
+    ChatInput:
+      type: object
+      required: [question]
+      properties:
+        question: { type: string, minLength: 2 }
+        studentId: { type: string, default: demo-student }
+    ChatMessage:
+      type: object
+      required: [id, role, content, createdAt]
+      properties:
+        id: { type: integer }
+        role: { type: string }
+        content: { type: string }
+        createdAt: { type: string }
+        citations:
+          type: array
+          items: { $ref: "#/components/schemas/Citation" }
+        toolsUsed:
+          type: array
+          items: { type: string }
+    ChatResponse:
+      type: object
+      required: [id, answer, citations, toolsUsed, memoryUsed, intent, createdAt]
+      properties:
+        id: { type: integer }
+        answer: { type: string }
+        citations:
+          type: array
+          items: { $ref: "#/components/schemas/Citation" }
+        toolsUsed:
+          type: array
+          items: { type: string }
+        memoryUsed:
+          type: array
+          items: { type: string }
+        intent: { type: string }
+        createdAt: { type: string }
+    Dashboard:
+      type: object
+      required: [documents, questions, upcomingExams, attendance, notices, profile]
+      properties:
+        documents: { type: integer }
+        questions: { type: integer }
+        upcomingExams: { type: integer }
+        attendance: { type: number }
+        notices: { type: integer }
+        profile: { $ref: "#/components/schemas/StudentProfile" }
+    TimetableEntry:
+      type: object
+      required: [id, day, time, course, room, instructor]
+      properties:
+        id: { type: integer }
+        day: { type: string }
+        time: { type: string }
+        course: { type: string }
+        room: { type: string }
+        instructor: { type: string }
+    AttendanceRecord:
+      type: object
+      required: [id, course, attended, total, percentage, status]
+      properties:
+        id: { type: integer }
+        course: { type: string }
+        attended: { type: integer }
+        total: { type: integer }
+        percentage: { type: number }
+        status: { type: string }
+    Notice:
+      type: object
+      required: [id, title, category, date, summary, priority]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        category: { type: string }
+        date: { type: string }
+        summary: { type: string }
+        priority: { type: string }
+    Exam:
+      type: object
+      required: [id, course, date, time, venue, type]
+      properties:
+        id: { type: integer }
+        course: { type: string }
+        date: { type: string }
+        time: { type: string }
+        venue: { type: string }
+        type: { type: string }
+    Faq:
+      type: object
+      required: [id, question, answer, category]
+      properties:
+        id: { type: integer }
+        question: { type: string }
+        answer: { type: string }
+        category: { type: string }
+

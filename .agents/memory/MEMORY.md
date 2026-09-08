@@ -1,0 +1,1 @@
+- [Assistant demo seeding](assistant-seeding.md) — keep first-load demo initialization single-flight so concurrent screens cannot race.

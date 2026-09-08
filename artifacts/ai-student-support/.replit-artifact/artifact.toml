@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AI Student Support Assistant"
+description = "A functional agentic AI assistant for college students that answers questions from uploaded documents, remembers student context, and uses timetable, attendance, notice, exam, and FAQ tools to provide personalized support."
+version = "1.0.0"
+id = "artifacts/ai-student-support"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21580
+
+[services.development]
+run = "pnpm --filter @workspace/ai-student-support run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ai-student-support", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ai-student-support/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21580"
+BASE_PATH = "/"
